@@ -9,6 +9,8 @@ import java.util.Map;
 public class Graph {
     private Map<Node, List<Edge>> adjacencyList;
 
+    public static final int DIAMETER = 32;
+
     public Graph() {
         this.adjacencyList = new HashMap<>();
     }
@@ -39,24 +41,35 @@ public class Graph {
         Graphics2D g2d = (Graphics2D) g;
         adjacencyList.forEach((source, edges)-> {
             g2d.setColor(new Color(0x2671A4));
-            g2d.fillOval(source.getPoint().x - 8, source.getPoint().y - 8, 16, 16);
+            g2d.fillOval(source.getPoint().x - DIAMETER/2, source.getPoint().y - DIAMETER/2, DIAMETER, DIAMETER);
             edges.forEach(edge -> {
                 g2d.setColor(new Color(0x2671A4));
-                g2d.fillOval(edge.getTo().getPoint().x - 8,edge.getTo().getPoint().y - 8,16,16);
-
+                g2d.fillOval(edge.getTo().getPoint().x - DIAMETER/2,edge.getTo().getPoint().y - DIAMETER/2,DIAMETER,DIAMETER);
                 g2d.setColor(new Color(0xE07A00));
                 g2d.setStroke(new BasicStroke(3));
                 double angle = Math.atan2(edge.getTo().getPoint().y - source.getPoint().y,
                         edge.getTo().getPoint().x - source.getPoint().x);
 
-                int startX = source.getPoint().x + (int)(Math.cos(angle) * 8);
-                int startY = source.getPoint().y + (int)(Math.sin(angle) * 8);
+                int startX = source.getPoint().x + (int)(Math.cos(angle) * DIAMETER/2);
+                int startY = source.getPoint().y + (int)(Math.sin(angle) * DIAMETER/2);
 
-                int endX = edge.getTo().getPoint().x - (int)(Math.cos(angle) * 8);
-                int endY = edge.getTo().getPoint().y - (int)(Math.sin(angle) * 8);
+                int endX = edge.getTo().getPoint().x - (int)(Math.cos(angle) * DIAMETER/2);
+                int endY = edge.getTo().getPoint().y - (int)(Math.sin(angle) * DIAMETER/2);
 
                 g2d.drawLine(startX, startY, endX, endY);
             });
+        });
+
+        adjacencyList.forEach((source,  edges) -> {
+            g2d.setColor(new Color(0x000000));
+
+            Font font = new Font("Arial", Font.BOLD, 20);
+            g2d.setFont(font);
+            FontMetrics metrics = g2d.getFontMetrics(font);
+            int letterX = source.getPoint().x - metrics.stringWidth(String.valueOf(source.getId())) / 2;
+            int letterY = source.getPoint().y - metrics.getHeight() / 2 + metrics.getAscent();
+
+            g2d.drawString(String.valueOf(source.getId()), letterX, letterY);
         });
     }
 }

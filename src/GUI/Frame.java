@@ -25,11 +25,10 @@ public class Frame extends JFrame {
     private Graph graph;
 
     public Frame() {
-        // Basic JFrame setup
         this.setSize(new Dimension(1080, 800));
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setResizable(false);
-        this.setLayout(null); // Use null layout for manual component positioning
+        this.setLayout(null);
 
         JPanel mainPanel = new JPanel() {
             @Override
@@ -39,15 +38,14 @@ public class Frame extends JFrame {
                 graph.drawGraph(g);
             }
         };
-        mainPanel.setBackground(new Color(0x0B1F3F)); // Set background color
-        mainPanel.setBounds(0, 0, 1080, 800); // Set size and position to match the frame
-        mainPanel.setLayout(null); // Set layout if adding components manually
+        mainPanel.setBackground(new Color(0x0B1F3F));
+        mainPanel.setBounds(0, 0, 1080, 800);
+        mainPanel.setLayout(null);
 
-        this.add(mainPanel); // Add the panel to the JFrame
+        this.add(mainPanel);
 
         graph = new Graph();
 
-        // Add mouse listeners to the panel
         mainPanel.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
@@ -61,7 +59,7 @@ public class Frame extends JFrame {
                 if(first==null) {
                     boolean found = false;
                     for(Map.Entry<Node, List<Edge>> map : graph.getAdjacencyList().entrySet()) {
-                        if(Util.distance(e.getPoint(), map.getKey().getPoint()) <= 16.0) {
+                        if(Util.distance(e.getPoint(), map.getKey().getPoint()) <= Graph.DIAMETER) {
                             first = map.getKey();
                             found = true;
                             break;
@@ -81,11 +79,18 @@ public class Frame extends JFrame {
                 }
 
                 if(second != null) {
-                    graph.addEdge(first, second, 1);
-                    graph.addEdge(second, first, 1);
-                    first = second = null;
+                    String weightString = JOptionPane.showInputDialog(Frame.this,
+                            "Enter weight for the edge: ", "Edge Weight", JOptionPane.PLAIN_MESSAGE);                    try {
+                        int weight = Integer.parseInt(weightString);
+                        graph.addEdge(first, second, weight);
+                        graph.addEdge(second, first, weight);
+                        first = second = null;
 
-                    repaint();
+                        repaint();
+                    } catch (NumberFormatException exception) {
+                        JOptionPane.showMessageDialog(Frame.this, "Invalid input. Please enter an integer.", "Error", JOptionPane.ERROR_MESSAGE);
+                    }
+
                 }
             }
         });
@@ -94,12 +99,11 @@ public class Frame extends JFrame {
             @Override
             public void mouseDragged(MouseEvent e) {
                 super.mouseDragged(e);
-                // Add custom behavior for mouse dragged
             }
         });
 
-        mainPanel.setFocusable(true); // Make the panel focusable
-        mainPanel.requestFocusInWindow(); // Request focus for the panel
+        mainPanel.setFocusable(true);
+        mainPanel.requestFocusInWindow();
         mainPanel.addKeyListener(new KeyAdapter() {
             @Override
             public void keyReleased(KeyEvent e) {
@@ -109,7 +113,6 @@ public class Frame extends JFrame {
                 }
             }
         });
-
-        this.setVisible(true); // Make the frame visible
+        this.setVisible(true);
     }
 }
