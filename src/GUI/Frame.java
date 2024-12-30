@@ -9,6 +9,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,7 +19,7 @@ public class Frame extends JFrame {
     private Point nodePosition = null; // Holds the current position of the node
     private boolean clicked = false;
 
-    private static int nodeCount = 0;
+    public static int nodeCount = 0;
 
     private Node first,second;
 
@@ -110,6 +111,36 @@ public class Frame extends JFrame {
                 super.keyReleased(e);
                 if(e.getKeyCode() == KeyEvent.VK_SPACE) {
                     graph.printGraph();
+                } else if(e.getKeyCode() == KeyEvent.VK_SHIFT) {
+                    graph.getAdjacencyList().forEach((source, edges) -> {
+                        edges.forEach(edge -> {
+                            edge.setHighlight(false);
+                        });
+                    });
+
+                    Dijkstra dijkstra = new Dijkstra(graph);
+                    List<Integer> path = new ArrayList<>();
+
+                    String weightString = JOptionPane.showInputDialog(Frame.this,
+                            "Enter end node ID: ", "Node ID", JOptionPane.PLAIN_MESSAGE);
+                    int end = Integer.parseInt(weightString);
+                    
+                    dijkstra.run(new Node(0), path, end);
+                    System.out.println(path);
+                    int counter = 0;
+
+                    while(counter != path.size() - 1) {
+                        if(graph.getAdjacencyList().containsKey(new Node(path.get(counter)))) {
+                            for(Edge edge : graph.getAdjacencyList().get(new Node(path.get(counter)))) {
+                                if(edge.getTo().getId() == path.get(counter + 1)) {
+                                    edge.setHighlight(true);
+                                    counter++;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    repaint();
                 }
             }
         });
